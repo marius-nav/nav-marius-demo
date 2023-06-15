@@ -1,0 +1,44 @@
+apiVersion: "monitoring.coreos.com/v1"
+kind: "PrometheusRule"
+metadata:
+  name: "nav-marius-demo"
+  namespace: "teamfamilie"
+  labels:
+    "team": "teamfamilie"
+  annotations:
+    "start.nais.io/created-by": "me"
+    "start.nais.io/creationTimestamp": "2023-06-12T11:05:56.815489742"
+spec:
+  groups:
+  - name: "nav-marius-demo-alerts"
+    rules:
+    - alert: "nav-marius-demo er nede"
+      description: "App {{ $labels.app }} er nede i namespace {{ $labels.kubernetes_namespace\
+        \ }}"
+      expr: "kube_deployment_status_replicas_unavailable{deployment=\"nav-marius-demo\"\
+        } > 0"
+      for: "2m"
+      action: "kubectl describe pod {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace\
+        \ }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }} -n {{\
+        \ $labels.kubernetes_namespace }}` for logger"
+      labels:
+        "severity": "warning"
+      annotations:
+        "consequence": "nav-marius-demo gjør ikke det den skal"
+        "action": "Fiks den!"
+        "sla": "Innen 3 timer i kontortid"
+        "documentation": "https://github.com/navikt/teamfamilie/somedoc"
+    - alert: "Mye feil i loggene"
+      expr: "(100 * sum by (log_app, log_namespace) (rate(logd_messages_total{log_app=\"\
+        nav-marius-demo\",log_level=~\"Warning|Error\"}[3m])) / sum by (log_app, log_namespace)\
+        \ (rate(logd_messages_total{log_app=\"nav-marius-demo\"}[3m]))) > 10"
+      for: "3m"
+      action: "Sjekk loggene til app {{ $labels.log_app }} i namespace {{ $labels.log_namespace\
+        \ }} for å se hvorfor det er så mye feil"
+      labels:
+        "severity": "critical"
+      annotations:
+        "consequence": "nav-marius-demo gjør ikke det den skal"
+        "action": "Fiks den!"
+        "sla": "Innen 3 timer i kontortid"
+        "documentation": "https://github.com/navikt/teamfamilie/somedoc"

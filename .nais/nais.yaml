@@ -1,0 +1,39 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: "nav-marius-demo"
+  namespace: "teamfamilie"
+  labels:
+    "team": "teamfamilie"
+  annotations:
+    "start.nais.io/created-by": "me"
+    "start.nais.io/creationTimestamp": "2023-06-12T11:05:56.815489742"
+spec:
+  image: {{image}}
+  liveness:
+    path: "/"
+    initialDelay: 20
+    timeout: 60
+  readiness:
+    path: "/"
+    initialDelay: 20
+    timeout: 60
+  port: 3000
+  replicas:
+    min: 2
+    max: 2
+    cpuThresholdPercentage: 50
+  prometheus:
+    enabled: false
+    path: "/metrics"
+  resources:
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+    requests:
+      cpu: "200m"
+      memory: "256Mi"
+  ingresses: 
+  {{#each ingresses as |url|}}
+    - {{url}}
+  {{/each}}
