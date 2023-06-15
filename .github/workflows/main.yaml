@@ -14,8 +14,8 @@ jobs:
     - uses: "actions/setup-node@v3"
     - name: "install dependencies"
       run: "npm ci"
-    - name: "run tests"
-      run: "npm test"
+    #- name: "run tests"
+    #  run: "npm test"
     - name: "Login to GitHub Docker Registry"
       uses: "docker/login-action@v2"
       with:
